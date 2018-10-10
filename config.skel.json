@@ -1,0 +1,15 @@
+{
+	"Bot": {
+		"Token": "",
+		"Config": {
+			"webHook": {
+				"port": 5055
+			}
+		},
+		"webHookUrl": ""
+	},
+	"COCToken": "",
+	"db": {
+		"uri": "mongodb://localhost:27017/cocwarbot"
+	}
+}
