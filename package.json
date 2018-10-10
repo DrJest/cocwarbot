@@ -1,0 +1,20 @@
+{
+  "name": "cocwarbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "DrJest",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.1",
+    "markdown-escape": "^1.0.2",
+    "moment": "^2.22.2",
+    "mongoose": "^5.2.1",
+    "node-emoji": "^1.8.1",
+    "node-telegram-bot-api": "^0.30.0",
+    "request": "^2.87.0"
+  }
+}
