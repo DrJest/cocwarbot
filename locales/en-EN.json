@@ -52,5 +52,10 @@
 	"ADMIN_ADDED": "Admin Added",
 	"ADMIN_INVALID": "Invalid Admin",
 	"ADMIN_DUPLICATE": "Duplicated Admin",
-	"ADMIN_REMOVED": "Removed Admin"
+	"ADMIN_REMOVED": "Removed Admin",
+	"WAR_NOT": "Not in a war!",
+	"WAR_PREPARATION": "War is ahead! Game begins at `{0}`",
+	"WAR_PROGRESS": "{0} fold war in progress. \nEnds: `{1}`\nRemaining: `{2}`\n",
+	"WAR_REMAINING_ATTACK": "Remaining Attacks",
+	"WAR_REMAINING_STARS": "Remaining Stars"
 }

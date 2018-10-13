@@ -35,6 +35,62 @@ module.exports = function(bot, request) {
     } );
   };
 
+  const getRemainingAttacksAndStars = war => {
+    war.oppn = war.opponent;
+    let remainingAttacks = [];
+    let remainingStars = [];
+    let tagsToCheck = [];
+    for( let m of war.clan.members ) {
+      let a = m.attacks ? 2 - m.attacks.length : 2;
+      if(a) {
+        remainingAttacks.push({
+          tag: m.tag,
+          name: m.name,
+          mapPosition: m.mapPosition,
+          attacks: a
+        });
+        tagsToCheck.push(m.tag);
+      }
+    }
+    remainingAttacks.sort((a,b) => a.mapPosition - b.mapPosition);
+    for( let m of war.oppn.members ) {
+      let s = 3;
+      if( m.bestOpponentAttack ) {
+        s = 3 - m.bestOpponentAttack.stars;
+      }
+      if(s) {
+        remainingStars.push({
+          tag: m.tag,
+          name: m.name,
+          mapPosition: m.mapPosition,
+          stars: s
+        });
+        tagsToCheck.push(m.tag);
+      }
+    }
+    remainingStars.sort((a,b) => a.mapPosition - b.mapPosition);
+    return new Promise((resolve, reject) => {
+      Async.mapLimit(tagsToCheck, 10, (t, next) => {
+        request.get( '/players/' + encodeURIComponent(t), (err, resp, user) => {
+          for(let m of remainingAttacks) {
+            if(m.tag === t) {
+              m.townHallLevel = user.townHallLevel;
+            }
+          }
+          for(let m of remainingStars) {
+            if(m.tag === t) {
+              m.townHallLevel = user.townHallLevel;
+            }
+          }
+          return next(err, t);
+        });
+      }, (err, tags) => {
+        if(err) return reject(err);
+        resolve({ remainingAttacks, remainingStars });
+      })
+    })
+  };
+
   const handleChatMessage = function(msg) {
     let command = msg.text.split(' ');
     let M = lang.l( this.locale );
@@ -118,7 +174,6 @@ module.exports = function(bot, request) {
           let tags = this.tags.map(t=>`\`${t}\``);
           Async.map(this.tags, ( t, next ) => {
             request.get( '/players/' + encodeURIComponent(t), (err, resp, user) => {
-              console.log(user);
               return next(err, ' `' + t + '` ' + require('markdown-escape')(user.name).replace('\\','') + ' ' + emoji.get('european_castle') + ' '+ user.townHallLevel);
             });
           }, (err, tags) => {
@@ -329,19 +384,46 @@ module.exports = function(bot, request) {
       case '/war': 
         request.get( '/clans/' + encodeURIComponent( this.clan_tag ) + '/currentwar', (err, req, war) => {
           if( war.state === 'notInWar' ) {
-            return bot.sendMessage(msg.chat.id, 'Not in a war!', {
+            return bot.sendMessage(msg.chat.id, M('WAR_NOT'), {
               reply_to_message_id: msg.message_id,
               parse_mode: 'markdown'
             });
           }
           if( war.state === 'preparation' ) {
-            return bot.sendMessage(msg.chat.id, 'War is ahead! Game begins at `' + moment(war.startTime,'YYYYMMDDTkkmmss.SSSZ').toString() + '`' , {
+            return bot.sendMessage(msg.chat.id, M('WAR_PREPARATION', moment(war.startTime,'YYYYMMDDTkkmmss.SSSZ').toString() ), {
               reply_to_message_id: msg.message_id,
               parse_mode: 'markdown'
             });
           }
           if( war.state === 'inWar' ) {
-
+            let remaining = moment.utc(moment(war.endTime,'YYYYMMDDTkkmmss.SSSZ').diff(moment())).format("HH:mm:ss")
+            let msgOpt = {
+              reply_to_message_id: msg.message_id,
+              parse_mode: 'markdown'
+            };
+            getRemainingAttacksAndStars(war).then( stuff => {
+              let message0 = M('WAR_PROGRESS', 
+                war.teamSize, 
+                moment(war.startTime,'YYYYMMDDTkkmmss.SSSZ').toString(),
+                remaining
+              );
+              let message1 = [ M('WAR_REMAINING_ATTACKS') ];
+              for(let u of stuff.remainingAttacks) {
+                message1.push(u.mapPosition + '. `' + u.name + ' ' + emoji.get('european_castle') + '` ' + u.townHallLevel + ' ' + emoji.get('crossed_swords').repeat(u.attacks) );
+              }
+              let message2 = [ M('WAR_REMAINING_STARS') ];
+              for(let u of stuff.remainingStars) {
+                message2.push(u.mapPosition + '. `' + u.name + ' ' + emoji.get('european_castle') + '` ' + u.townHallLevel  + ' ' + emoji.get('star').repeat(u.stars) );
+              }
+              try {
+                Async.series([
+                  bot.sendMessage(msg.chat.id, message0, msgOpt),
+                  bot.sendMessage(msg.chat.id, message1.join('\n'), msgOpt),
+                  bot.sendMessage(msg.chat.id, message2.join('\n'), msgOpt)
+                ]);
+              }
+              catch(e){}
+            } );
           }
           if( war.state === 'warEnded' ) {
             let r = `${emoji.get('rotating_light')} War ended!\n`;

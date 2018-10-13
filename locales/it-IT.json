@@ -52,5 +52,10 @@
 	"ADMIN_ADDED": "Admin Aggiunto",
 	"ADMIN_INVALID": "Admin non valido",
 	"ADMIN_DUPLICATE": "Admin già presente",
-	"ADMIN_REMOVED": "Admin Rimosso"
+	"ADMIN_REMOVED": "Admin Rimosso",
+	"WAR_NOT": "Not in a war!",
+	"WAR_PREPARATION": "War is ahead! Game begins at `{0}`",
+	"WAR_PROGRESS": "Guerra da {0} in corso. \nTermina: `{1}`\nTempo restante: `{2}`",
+	"WAR_REMAINING_ATTACK": "Attacchi rimanenti",
+	"WAR_REMAINING_STARS": "Stelle rimanenti"
 }
