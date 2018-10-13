@@ -140,10 +140,10 @@ module.exports = function(bot, request) {
 
   const warEndedMessage = war => {
     let r = `${emoji.get('rotating_light')} War ended!\n`;
-    if(war.clan.destructionPercentage > war.opponent.destructionPercentage) {
+    if(war.clan.stars > war.opponent.stars || ( war.clan.stars === war.opponent.stars && war.clan.destructionPercentage > war.opponent.destructionPercentage ) ) {
       r += 'We won!';
     }
-    else if( war.clan.destructionPercentage < war.opponent.destructionPercentage ) {
+    else if(war.clan.stars < war.opponent.stars || ( war.clan.stars === war.opponent.stars && war.clan.destructionPercentage < war.opponent.destructionPercentage ) ) {
       r += 'We lost!';
     }
     else {

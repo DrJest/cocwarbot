@@ -406,7 +406,7 @@ module.exports = function(bot, request) {
                 war.teamSize, 
                 moment(war.startTime,'YYYYMMDDTkkmmss.SSSZ').toString(),
                 remaining
-              );
+              ) + `\n \`${war.clan.name}\`: ${emoji.get('star')} ${war.clan.stars} ${emoji.get('boom')} ${war.clan.destructionPercentage}%\n\`${war.opponent.name}\`: ${emoji.get('star')} ${war.opponent.stars} ${emoji.get('boom')} ${war.opponent.destructionPercentage}%`
               let message1 = [ M('WAR_REMAINING_ATTACKS') ];
               for(let u of stuff.remainingAttacks) {
                 message1.push(u.mapPosition + '. `' + u.name + ' ' + emoji.get('european_castle') + '` ' + u.townHallLevel + ' ' + emoji.get('crossed_swords').repeat(u.attacks) );
@@ -427,10 +427,10 @@ module.exports = function(bot, request) {
           }
           if( war.state === 'warEnded' ) {
             let r = `${emoji.get('rotating_light')} War ended!\n`;
-            if(war.clan.destructionPercentage > war.opponent.destructionPercentage) {
+            if(war.clan.stars > war.opponent.stars || ( war.clan.stars === war.opponent.stars && war.clan.destructionPercentage > war.opponent.destructionPercentage ) ) {
               r += 'We won!';
             }
-            else if( war.clan.destructionPercentage < war.opponent.destructionPercentage ) {
+            else if(war.clan.stars < war.opponent.stars || ( war.clan.stars === war.opponent.stars && war.clan.destructionPercentage < war.opponent.destructionPercentage ) ) {
               r += 'We lost!';
             }
             else {
