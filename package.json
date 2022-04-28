@@ -9,7 +9,7 @@
   "author": "DrJest",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^2.6.4",
     "markdown-escape": "^1.0.2",
     "moment": "^2.29.2",
     "mongoose": "^5.7.5",
